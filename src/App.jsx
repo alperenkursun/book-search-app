@@ -1,13 +1,58 @@
 import React, { useState } from 'react';
-import { Search, X } from 'lucide-react';
+import axios from 'axios';
+import { Search, X, Loader2, BookImage } from 'lucide-react';
 import './App.css';
 
 function App() {
-  const[isModalOpen, setIsModalOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openModal = () => setIsModalOpen(true);
-  
-  const closeModal = () => setIsModalOpen(false);
+  const searchBooks = async (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+
+    setLoading(true);
+    setBooks([]);
+
+    try {
+      const response = await axios.get(
+        `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=ebook&limit=24`
+      );
+
+      const formattedBooks = response.data.results.map((book) => ({
+        id: book.trackId,
+        title: book.trackName,
+        authors: [book.artistName],
+        cover: book.artworkUrl100.replace('100x100', '400x400'),
+        publishDate: new Date(book.releaseDate).getFullYear() || 'N/A',
+        publisher: 'Apple Books',
+        pages: 'E-Kitap',
+        language: 'Çok dilli',
+        description: book.description || 'Bu kitap için açıklama bulunmuyor.',
+        link: book.trackViewUrl
+      }));
+
+      setBooks(formattedBooks);
+    } catch (error) {
+      console.error("API Hatası:", error);
+      alert("Bir bağlantı sorunu oluştu. Lütfen tekrar deneyin.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openDetails = (book) => {
+    setSelectedBook(book);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedBook(null);
+  };
 
   return (
     <div className="app-container">
@@ -16,118 +61,85 @@ function App() {
         <div className="hero-content">
           <h1 className="hero-title">Book Search using React</h1>
           
-          <form className="search-form" onSubmit={(e) => e.preventDefault()}>
+          <form className="search-form" onSubmit={searchBooks}>
             <input 
               type="text" 
               className="search-input" 
-              placeholder="Book Title or Author ..." 
+              placeholder="Kitap veya yazar adı yazın..." 
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
             />
-            <button type="submit" className="search-button">
-              <Search size={20} />
+            <button type="submit" className="search-button" disabled={loading}>
+              {loading ? <Loader2 className="spinner" size={20} /> : <Search size={20} />}
             </button>
           </form>
         </div>
       </header>
 
       <main className="main-content">
+        {books.length === 0 && !loading && (
+          <div className="empty-state">
+            <BookImage size={48} strokeWidth={1} />
+            <p>Arama yaparak kitapları keşfetmeye başlayın.</p>
+          </div>
+        )}
+
         <div className="books-grid">
-          
-          <article className="book-card">
-            <div className="book-image-container">
-              <img 
-                src="https://images-na.ssl-images-amazon.com/images/I/91asIC1fSBL.jpg" 
-                alt="React Cookbook" 
-                className="book-image"
-              />
-            </div>
-            <div className="book-actions">
-              <button className="action-btn" onClick={openModal}>DETAILS</button>
-            </div>
-            <h2 className="book-title">React Cookbook</h2>
-            <p className="book-author">Dawn Griffiths</p>
-          </article>
-
-          <article className="book-card">
-            <div className="book-image-container">
-              <img 
-                src="https://m.media-amazon.com/images/I/81Y7y6-0pFL._AC_UF1000,1000_QL80_.jpg" 
-                alt="React 17 Design Patterns" 
-                className="book-image"
-              />
-            </div>
-            <div className="book-actions">
-              <button className="action-btn" onClick={openModal}>DETAILS</button>
-            </div>
-            <h2 className="book-title">React 17 Design Patterns and Best Practices</h2>
-            <p className="book-author">Carlos Santana Roldan</p>
-          </article>
-
-          <article className="book-card">
-            <div className="book-image-container">
-              <img 
-                src="https://m.media-amazon.com/images/I/71uM5E6P2AL._AC_UF1000,1000_QL80_.jpg" 
-                alt="Practical Enterprise React" 
-                className="book-image"
-              />
-            </div>
-            <div className="book-actions">
-              <button className="action-btn" onClick={openModal}>DETAILS</button>
-            </div>
-            <h2 className="book-title">Practical Enterprise React</h2>
-            <p className="book-author">Ruby Jane Cabagnot</p>
-          </article>
-
+          {books.map((book) => (
+            <article className="book-card" key={book.id}>
+              <div className="book-image-container">
+                <img src={book.cover} alt={book.title} className="book-image" />
+              </div>
+              <div className="book-actions">
+                <button className="action-btn" onClick={() => openDetails(book)}>DETAILS</button>
+              </div>
+              <h2 className="book-title">{book.title}</h2>
+              <p className="book-author">{book.authors[0]}</p>
+            </article>
+          ))}
         </div>
       </main>
 
-      {isModalOpen && (
+      {isModalOpen && selectedBook && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={closeModal}>
-              <X size={24} />
-            </button>
+            <button className="modal-close-btn" onClick={closeModal}><X size={24} /></button>
             
             <div className="modal-body">
               <div className="modal-image-wrapper">
-                <img 
-                  src="https://images-na.ssl-images-amazon.com/images/I/91asIC1fSBL.jpg" 
-                  alt="React Cookbook" 
-                  className="modal-image"
-                />
+                <img src={selectedBook.cover} alt={selectedBook.title} className="modal-image" />
               </div>
               
               <div className="modal-info">
-                <h2 className="modal-title">React Cookbook</h2>
-                <h3 className="modal-author">Dawn Griffiths, David Griffiths</h3>
+                <h2 className="modal-title">{selectedBook.title}</h2>
+                <h3 className="modal-author">{selectedBook.authors[0]}</h3>
                 
                 <div className="modal-details-grid">
                   <div className="detail-item">
-                    <span className="detail-label">Yayın Tarihi</span>
-                    <span className="detail-value">2021-08-31</span>
+                    <span className="detail-label">Yayın Yılı</span>
+                    <span className="detail-value">{selectedBook.publishDate}</span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Sayfa Sayısı</span>
-                    <span className="detail-value">550 Sayfa</span>
+                    <span className="detail-label">Tür</span>
+                    <span className="detail-value">E-Kitap</span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Yayınevi</span>
-                    <span className="detail-value">O'Reilly Media</span>
+                    <span className="detail-label">Platform</span>
+                    <span className="detail-value">Apple Books</span>
                   </div>
                   <div className="detail-item">
-                    <span className="detail-label">Dil</span>
-                    <span className="detail-value">İngilizce</span>
+                    <span className="detail-label">Durum</span>
+                    <span className="detail-value">Aktif</span>
                   </div>
                 </div>
 
                 <div className="modal-description">
-                  <p>
-                    React helps you write logic that handles everything from data changes to rendering elements based on those changes. But what happens when things get complex? This cookbook provides the recipes you need to master React to build large, enterprise-class applications.
-                  </p>
+                  <p>{selectedBook.description.replace(/<[^>]*>?/gm, '')}</p>
                 </div>
 
                 <div className="modal-footer">
-                  <a href="#" className="modal-preview-link" target="_blank" rel="noopener noreferrer">
-                    Kitabı İncele (Google Books)
+                  <a href={selectedBook.link} className="modal-preview-link" target="_blank" rel="noopener noreferrer">
+                    Apple Books'ta Görüntüle
                   </a>
                 </div>
               </div>

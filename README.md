@@ -1,16 +1,59 @@
-# React + Vite
+# book-search-app
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React • Vite • Axios • iTunes API App
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[See The Project](https://akbooksearchapp.netlify.app/)
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+![bsa](bca.webp)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Bu proje, iTunes API verilerini kullanarak kullanıcıların diledikleri kitap veya yazar ismine göre arama yapabildiği, modern arayüzlü ve dinamik bir kitap keşif uygulamasıdır. Kullanıcı dostu modal yapısı sayesinde kitap detaylarına hızlıca erişim imkanı sunar.
+
+### 🚀 Özellikler
+
+- **Dinamik Arama Sistemi:** Arama çubuğuna girilen ifadeye göre iTunes API (e-book servisi) üzerinden gerçek zamanlı veriler çekilir ve anlık olarak listelenir.
+- **Detaylı Bilgi (Modal):** Her kitap kartında bulunan "DETAILS" butonu sayesinde; kitabın büyük boy kapağı, yayın yılı, türü ve açıklama metni gibi bilgilere şık bir modal üzerinden erişilir.
+- **Gelişmiş UX:** Arama sırasında aktif olan yüklenme animasyonu (spinner) ve sonuç bulunamadığında gösterilen "Boş Durum" (Empty State) görselleri ile kullanıcı deneyimi optimize edilmiştir.
+- **Modern Responsive Tasarım:** Pure CSS kullanılarak hazırlanan ızgara (grid) yapısı, mobil cihazlardan geniş masaüstü ekranlara kadar kusursuz bir uyum sağlar.
+- **Performanslı Veri Yönetimi:** Axios ve React Hooks (`useState`) kullanılarak API istekleri ve uygulama durumu (state) modern standartlara göre yönetilir.
+
+### 🛠️ Teknoloji Yığını
+
+- **Frontend:** React (Vite)
+- **Styling:** Pure CSS (Modern UI/UX)
+- **İkonlar:** Lucide React
+- **Veri Kaynağı:** iTunes Search API
+- **HTTP Client:** Axios
+- **Paket Yöneticisi:** Yarn
+
+### 📋 Gereksinimler
+
+- Node.js (v18+)
+- Yarn (v1.22+)
+
+### 🔧 Kurulum ve Çalıştırma
+
+```bash
+# Projeyi klonlayın
+git clone https://github.com/KULLANICI_ADIN/book-search-app
+
+# Proje klasörüne gidin
+cd book-search-app
+
+# Gerekli paketleri (node_modules) yükleyin
+yarn install
+
+# Uygulamayı başlatın (Geliştirici ortamı)
+yarn dev
+```
+
+---
+
+[Frontend Web Development Projeleri](https://academy.patika.dev/courses/frontend-web-development-projeleri/kitap-arama-uygulamasi)
+
+[Patika Profile](https://academy.patika.dev/tr/@alpk)
